@@ -78,7 +78,7 @@ class ApiClient(object):
             self.default_headers[header_name] = header_value
         self.cookie = cookie
         # Set default User-Agent.
-        self.user_agent = 'OpenAPI-Generator/4.0.0/python'
+        self.user_agent = 'OpenAPI-Generator/5.0.2/python'
         self.client_side_validation = configuration.client_side_validation
 
     def __enter__(self):
@@ -316,7 +316,7 @@ class ApiClient(object):
         elif klass == datetime.datetime:
             return self.__deserialize_datetime(data)
         else:
-            return self.deserialize_model(data, klass)
+            return self.__deserialize_model(data, klass)
 
     def call_api(self, resource_path, method,
                  path_params=None, query_params=None, header_params=None,
@@ -633,7 +633,7 @@ class ApiClient(object):
                 )
             )
 
-    def deserialize_model(self, data, klass):
+    def __deserialize_model(self, data, klass):
         """Deserializes list or dict to model.
 
         :param data: dict, list.

@@ -234,7 +234,7 @@ class CreateTemplateCampaign(object):
     def campaign_groups(self):
         """Gets the campaign_groups of this CreateTemplateCampaign.  # noqa: E501
 
-        The IDs of the [campaign groups](https://docs.talon.one/docs/product/account/managing-campaign-groups) this campaign belongs to.   # noqa: E501
+        The IDs of the [campaign groups](https://docs.talon.one/docs/product/account/account-settings/managing-campaign-groups/) this campaign belongs to.   # noqa: E501
 
         :return: The campaign_groups of this CreateTemplateCampaign.  # noqa: E501
         :rtype: list[int]
@@ -245,7 +245,7 @@ class CreateTemplateCampaign(object):
     def campaign_groups(self, campaign_groups):
         """Sets the campaign_groups of this CreateTemplateCampaign.
 
-        The IDs of the [campaign groups](https://docs.talon.one/docs/product/account/managing-campaign-groups) this campaign belongs to.   # noqa: E501
+        The IDs of the [campaign groups](https://docs.talon.one/docs/product/account/account-settings/managing-campaign-groups/) this campaign belongs to.   # noqa: E501
 
         :param campaign_groups: The campaign_groups of this CreateTemplateCampaign.  # noqa: E501
         :type: list[int]
