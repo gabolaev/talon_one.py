@@ -15,15 +15,26 @@ from __future__ import absolute_import
 import unittest
 
 import talon_one
+import os
 from talon_one.api.integration_api import IntegrationApi  # noqa: E501
 from talon_one.rest import ApiException
+from pprint import pprint
 
 
 class TestIntegrationApi(unittest.TestCase):
     """IntegrationApi unit test stubs"""
 
     def setUp(self):
-        self.api = talon_one.api.integration_api.IntegrationApi()  # noqa: E501
+        configuration = talon_one.Configuration(
+            host = "http://host.docker.internal:9000",
+            api_key_prefix = {
+                "Authorization": "ApiKey-v1"
+            },
+            api_key = {
+                "Authorization": os.getenv("IAPI_KEY")
+            }
+        )
+        self.api = talon_one.api.IntegrationApi(talon_one.ApiClient(configuration))  # noqa: E501
 
     def tearDown(self):
         pass
@@ -96,7 +107,13 @@ class TestIntegrationApi(unittest.TestCase):
 
         Get customer session  # noqa: E501
         """
-        pass
+        try:
+            customer_session_id = 'test_session_id'
+            session = self.api.get_customer_session(customer_session_id)
+            pprint(session)
+            pass
+        except ApiException as e:
+            print("Exception when calling IntegrationApi->get_customer_session: %s\n" % e)
 
     def test_get_loyalty_balances(self):
         """Test case for get_loyalty_balances
@@ -141,10 +158,8 @@ class TestIntegrationApi(unittest.TestCase):
         pass
 
     def test_reopen_customer_session(self):
-        """Test case for reopen_customer_session
-
-        Reopen customer session  # noqa: E501
-        """
+        api_response = self.api.reopen_customer_session("customer_session_py_4_1")
+        pprint(api_response)
         pass
 
     def test_return_cart_items(self):
@@ -211,10 +226,58 @@ class TestIntegrationApi(unittest.TestCase):
         pass
 
     def test_update_customer_session_v2(self):
-        """Test case for update_customer_session_v2
+        # Preparing a NewCustomerSessionV2 object
+        customer_session = talon_one.NewCustomerSessionV2(
+        profile_id="PROFILE_ID_py_4",
+        state="closed",
+        )
+        customer_session.cart_items = [
+            talon_one.CartItem(name="Red Spring Blouse",
+                            sku="rdbs-1111",
+                            quantity=1,
+                            price=49.4,
+                            category="Shirts"),
+            talon_one.CartItem(name="Denim Trousers",
+                            sku="dtr-2222",
+                            quantity=1,
+                            price=74.3,
+                            category="Trousers"),
+        ]
+        customer_session.coupon_codes = [
+            "Cool_Stuff"
+        ]
 
-        Update customer session  # noqa: E501
-        """
+        # Instantiating a new IntegrationRequest object
+        integration_request = talon_one.IntegrationRequest(
+            customer_session,
+            # Optional list of requested information to be present on the response.
+            # See models/integration_request.py for full list
+            # ["customerSession", "loyalty"]
+        )
+
+        try:
+            # Create/update a customer session using `update_customer_session_v2` function
+            api_response = self.api.update_customer_session_v2("customer_session_py_4_1", integration_request)
+            pprint(api_response)
+
+            # Parsing the returned effects list, please consult https://developers.talon.one/Integration-API/handling-effects-v2 for the full list of effects and their corresponding properties
+            for effect in api_response.effects:
+                if effect.effect_type == "setDiscount":
+                    # Initiating right props instance according to the effect type
+                    setDiscountProps = self.api.api_client.deserialize_model(effect.props, talon_one.SetDiscountEffectProps)
+
+                    # Access the specific effect's properties
+                    print("Set a discount '{name}' of {value}".format(
+                        name = setDiscountProps.name,
+                        value = setDiscountProps.value
+                    ))
+                elif effect.effect_type == "rejectCoupon":
+                    rejectCouponEffectProps = self.api.api_client.deserialize_model(effect.props, talon_one.RejectCouponEffectProps)
+
+                    # Work with AcceptCouponEffectProps' properties
+                    # ...
+        except ApiException as e:
+            print("Exception when calling IntegrationApi->update_customer_session_v2: %s\n" % e)
         pass
 
 

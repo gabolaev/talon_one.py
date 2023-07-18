@@ -15,15 +15,26 @@ from __future__ import absolute_import
 import unittest
 
 import talon_one
+import os
 from talon_one.api.management_api import ManagementApi  # noqa: E501
 from talon_one.rest import ApiException
+from pprint import pprint
 
 
 class TestManagementApi(unittest.TestCase):
     """ManagementApi unit test stubs"""
 
     def setUp(self):
-        self.api = talon_one.api.management_api.ManagementApi()  # noqa: E501
+        configuration = talon_one.Configuration(
+            host = "http://host.docker.internal:9000",
+            api_key_prefix = {
+                "Authorization": "ManagementKey-v1"
+            },
+            api_key = {
+                "Authorization": os.getenv("MAPI_KEY")
+            }
+        )
+        self.api = talon_one.api.management_api.ManagementApi(talon_one.ApiClient(configuration))  # noqa: E501
 
     def tearDown(self):
         pass
@@ -334,7 +345,13 @@ class TestManagementApi(unittest.TestCase):
 
         Get Application  # noqa: E501
         """
-        pass
+        try:
+            application = self.api.get_application(1)
+            pprint(application)
+            pass
+        except ApiException as e:
+            print("Exception when calling get_application: %s\n" % e)
+
 
     def test_get_application_api_health(self):
         """Test case for get_application_api_health
